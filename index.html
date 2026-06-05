@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Campbell CH115 UI / POP Clickable Quiz</title>
+<style>
+:root {
+  --navy:#003b70; --blue:#005ea8; --teal:#00a3ad; --light:#eaf7fb;
+  --line:#d5e5ef; --green:#198754; --red:#c62828; --gold:#f6c343;
+}
+* { box-sizing:border-box; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:linear-gradient(180deg,#f5fbff 0%,#eef5f9 100%);
+  margin:0; font-size:11px; color:#1b1f23;
+}
+header {
+  background:linear-gradient(135deg,var(--navy),var(--blue),var(--teal));
+  color:white; padding:12px 22px; position:sticky; top:0; z-index:20;
+}
+h1 { margin:0; font-size:18px; }
+#stats { margin-top:6px; font-size:11px; }
+.controls {
+  padding:8px 22px; background:white; border-bottom:1px solid var(--line);
+  position:sticky; top:58px; z-index:19; display:flex; gap:7px; flex-wrap:wrap;
+}
+button,input {
+  font-size:10.5px; padding:6px 8px; border-radius:8px; border:1px solid #aac4d3; background:white;
+}
+button.primary { background:var(--blue); color:white; }
+button.teal { background:var(--teal); color:white; }
+.container { max-width:1120px; margin:16px auto; padding:0 12px; }
+.card {
+  background:white; border-radius:13px; box-shadow:0 5px 18px rgba(0,38,77,.10);
+  margin-bottom:12px; border:1px solid var(--line); overflow:hidden;
+}
+.card-head {
+  background:linear-gradient(90deg,var(--navy),var(--blue)); color:white;
+  padding:7px 10px; display:flex; justify-content:space-between;
+}
+.meta { font-size:11px; font-weight:700; }
+.badge { background:rgba(255,255,255,.18); padding:2px 7px; border-radius:999px; font-size:9.8px; margin-left:5px; }
+.card-body { padding:10px 12px 12px; }
+.stem { font-size:11.5px; line-height:1.38; white-space:pre-wrap; margin-bottom:8px; }
+.choice {
+  display:block; margin:6px 0; padding:6px 8px; border:1px solid #d6e5ee;
+  border-radius:9px; background:#fbfdff; line-height:1.32;
+}
+.choice:hover { background:var(--light); }
+.correct { background:#e5f7ec!important; border-color:var(--green)!important; }
+.wrong { background:#ffe7e7!important; border-color:var(--red)!important; }
+.answer-box {
+  display:none; margin-top:10px; padding:8px 10px; background:#e5f7ec;
+  border-left:5px solid var(--green); border-radius:8px;
+}
+.rationale { display:none; margin-top:10px; }
+.rat-section {
+  padding:10px; background:#fff9e8; border-left:5px solid var(--gold);
+  border-radius:9px; white-space:pre-wrap; line-height:1.35; font-size:10.8px;
+}
+.img-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px; margin:10px 0;
+}
+.img-wrap { background:#f8fbfd; border:1px solid var(--line); border-radius:10px; padding:6px; text-align:center; }
+.img-wrap img { max-width:100%; max-height:430px; border-radius:7px; object-fit:contain; }
+.ref-panel { margin-top:10px; border:1px solid #b9dce8; border-radius:12px; overflow:hidden; background:#f3fbfd; }
+.ref-title { background:linear-gradient(90deg,var(--blue),var(--teal)); color:white; padding:8px 10px; font-weight:800; }
+.footer { text-align:center; padding:22px; color:#5f6b7a; }
+
+.summary-card {
+    background:white;
+    border-radius:13px;
+    box-shadow:0 5px 18px rgba(0,38,77,.10);
+    margin-bottom:18px;
+    border:1px solid var(--line);
+    overflow:hidden;
+}
+.summary-head {
+    background:linear-gradient(90deg,var(--navy),var(--teal));
+    color:white;
+    padding:9px 12px;
+    font-size:13px;
+    font-weight:800;
+}
+.summary-body {
+    padding:14px 16px 18px;
+}
+.summary-heading {
+    background:#eaf7fb;
+    border-left:6px solid var(--teal);
+    border-radius:9px;
+    padding:10px 12px;
+    margin:10px 0;
+    font-size:13px;
+    font-weight:800;
+    color:var(--navy);
+}
+.summary-text {
+    background:#fbfdff;
+    border:1px solid #d6e5ee;
+    border-radius:9px;
+    padding:10px 12px;
+    margin:8px 0;
+    line-height:1.45;
+    font-size:11px;
+}
+.summary-img-wrap {
+    background:#f8fbfd;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:7px;
+    margin:10px 0;
+    text-align:center;
+}
+.summary-img {
+    max-width:100%;
+    max-height:650px;
+    border-radius:7px;
+    object-fit:contain;
+}
+
+</style>
+</head>
+<body>
+<header>
+<h1>Campbell CH115 Urinary Incontinence / Pelvic Organ Prolapse Clickable Quiz</h1>
+<div id="stats"></div>
+</header>
+
+<div class="controls">
+<input type="text" id="searchBox" placeholder="Search question/topic..." oninput="render()" style="min-width:260px;">
+<button class="primary" onclick="nextUnanswered()">Next unanswered</button>
+<button onclick="showAll()">Show all rationales</button>
+<button onclick="hideAll()">Hide rationales</button>
+<button onclick="resetQuiz()">Reset</button>
+<button class="teal" onclick="window.print()">Print / Save PDF</button>
+<button class="primary" onclick="document.getElementById('chapter-summary').scrollIntoView({behavior:'smooth', block:'start'})">Chapter Summary</button>
+</div>
+
+<div class="container" id="exam"></div>
+
+<div class="container" id="chapter-summary-container">
+  <div class="summary-card" id="chapter-summary">
+    <div class="summary-head">Chapter Summary</div>
+    <div class="summary-body">
+      <div class="summary-heading">Campbell Review Chapter Summary</div>
+<div class="summary-text">1. Pelvic organ prolapse may mask incontinence.</div>
+<div class="summary-text">2. The prevalence of urinary incontinence in women is between 25% and 40%. Ten percent of women experience weekly incontinence episodes. Fecal incontinence occurs in 17% of women with pelvic organ prolapse.</div>
+<div class="summary-text">3. The female bladder neck is weaker than the male bladder neck and is often incompetent.</div>
+<div class="summary-text">4. In women, the majority of the urethra should be considered an active area of sphincter control; however, in the female the most important portion of continence is the mid-urethra.</div>
+<div class="summary-text">5. A Valsalva leak point pressure of less than 60 cm H2O indicates but does not confirm intrinsic sphincter dysfunction.</div>
+<div class="summary-text">6. Twelve percent of men report terminal dribbling.</div>
+<div class="summary-text">7. Rates of overactive bladder increase with age.</div>
+<div class="summary-text">8. Oral estrogen treatment is associated with the development of incontinence. Topical estrogen therapy is not linked to stress incontinence.</div>
+<div class="summary-text">9. Intrinsic properties of the urethra mucosa and urethra wall are important in maintaining continence in women.</div>
+<div class="summary-text">10. The anterior vaginal wall provides posterior support of the urethra allowing for compression of the mid-urethra. The urethra is attached laterally to the arcus tendineus by the urethra pelvic ligaments.</div>
+<div class="summary-text">11. Urge UI and mixed UI appear to become more prevalent forms of UI with aging.</div>
+<div class="summary-text">12. Age is strongly correlated with the development of UI of all types. White women appear to be at greater risk for UI when compared with African American and Asian women in particular.</div>
+<div class="summary-text">13. POP-Q points are measured by their distance from the hymenal ring (in centimeters). By definition, Aa and Ap are the points 3 cm from the hymen on the anterior and posterior vaginal walls, respectively. Ba and Bp point represent the leading edge of the most advanced aspect of the prolapse on the anterior and posterior vaginal walls, respectively. Thus they can be well beyond + 3 in advanced prolapse. C point represents the distance from the hymen to the cervix or vaginal cuff (post hysterectomy).</div>
+<div class="summary-text">14. The leading edge of the most advanced POP is greater than 1 cm proximal to the hymen in patients with stage 1 prolapse. Stage 2 patients will have their leading edge between 1 cm proximal to and distal to the hymen. Stage 3 indicates a leading edge greater than 1 cm beyond the hymen but not completely everted.</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Big Book screenshots appear inside rationale only.</div>
+
+<script>
+const QUESTIONS = [{"id": "CH115_Q1", "number": "1", "stem": "An example of a lower urinary tract (LUT) symptom is:", "choices": [{"letter": "A", "text": "urine loss while playing tennis."}, {"letter": "B", "text": "urodynamic stress incontinence with Valsalva leak point pressure (VLPP) of 60 cm H2O."}, {"letter": "C", "text": "a symptom score of 19 on the AUA Symptom Index."}, {"letter": "D", "text": "the finding of urinary incontinence on a supine stress test."}, {"letter": "E", "text": "the presence of stage 2 anterior pelvic organ prolapse on a cystogram."}], "answer": "A", "rationale": ". urine loss while playing tennis.\nCampbell Review\nrationale:\nA LUT symptom is one that is recognizable by the patient. A sign is one that is observable by a clinician (i.e., urine loss during a supine stress test). A VLPP result is a urodynamic observation, whereas a cystogram report of a cystocele is a radiologic observation.\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2218)\nThe Big Book separates LUT assessment into symptoms, signs, and observations. Symptoms are subjective patient/caregiver reports, whereas signs are clinician-observable and observations include urodynamic or nonurodynamic findings. Thus, patient-reported urine loss during tennis is the LUT symptom; the supine stress test is a sign, VLPP is a urodynamic observation, and cystogram POP is a radiologic observation.\nCampbell Big Book screenshot(s):\nPrinted p. 2218: Signs, symptoms, and urodynamic/nonurodynamic observations: symptom is patient-reported; sign is clinician-observed; observation may be urodynamic or nonurodynamic.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q1_image_0001.png"]}, {"id": "CH115_Q2", "number": "2", "stem": "Which of the following is consistent with the diagnosis of urgency urinary incontinence?", "choices": [{"letter": "A", "text": "Leakage of urine with coughing and a VLPP of 60 cm H2O"}, {"letter": "B", "text": "Leakage of urine with detrusor overactivity"}, {"letter": "C", "text": "Leakage of urine while coughing and detrusor leak point pressure of 50 cm H2O"}, {"letter": "D", "text": "Leakage of urine while coughing and leakage of urine with urgency"}, {"letter": "E", "text": "Leakage of urine and feces while straining"}], "answer": "B", "rationale": ". Leakage of urine with detrusor overactivity.\nCampbell Review\nrationale:\nB. Leakage of urine with detrusor overactivity. Urgency urinary incontinence may be associated with detrusor overactivity (DO), though DO need not be present for the diagnosis, merely sense of urgency with loss of urine. Mixed incontinence is the symptomatic complaint of both stress urinary incontinence and urgency incontinence.\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2219)\nThe Big Book defines urgency urinary incontinence as involuntary urine loss associated with urgency. It also notes that DO incontinence may be present in patients with UUI, although DO is not required to establish the diagnosis. Therefore leakage with detrusor overactivity is consistent with UUI, while leakage with both coughing and urgency describes mixed urinary incontinence.\nCampbell Big Book screenshot(s):\nPrinted p. 2219: Table 108.1 and incontinence definitions: UUI is urine loss associated with urgency; DO may be associated but is not required.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q2_image_0002.png"]}, {"id": "CH115_Q3", "number": "3", "stem": "The most common form of urinary incontinence (UI) in a woman aged 40 years is:", "choices": [{"letter": "A", "text": "stress incontinence."}, {"letter": "B", "text": "urgency incontinence."}, {"letter": "C", "text": "mixed incontinence."}, {"letter": "D", "text": "detrusor overactivity incontinence."}, {"letter": "E", "text": "continuous incontinence."}], "answer": "A", "rationale": ". stress incontinence.\nCampbell Review\nrationale:\nA. Stress incontinence. Stress urinary incontinence (SUI) is the most common form of UI in young women. In contrast, urge UI and mixed UI appear to become more prevalent forms of UI with aging. Continuous incontinence is uncommon—often associated with iatrogenic injuries to the lower urinary tract resulting in fistulae.\nCampbell Big Book\nrationale: (Campbell Big Book printed pp. 2220-2221)\nFor younger and middle-aged female cohorts, SUI is the dominant pattern. The Big Book states that SUI is most commonly reported among younger cohorts and that women aged 40 to 59 are most likely to report SUI, whereas UUI and MUI become more prevalent after age 60. Continuous incontinence is usually linked to fistula-type lower urinary tract injury and is not the typical pattern in a 40-year-old woman.\nCampbell Big Book screenshot(s):\nPrinted p. 2221: Female UI subtype prevalence by age: women 40-59 most likely report SUI; UUI/MUI become more prevalent after age 60.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q3_image_0003.png"]}, {"id": "CH115_Q4", "number": "4", "stem": "What factor has been associated with LUTS but not urinary incontinence in women?", "choices": [{"letter": "A", "text": "Advancing age."}, {"letter": "B", "text": "Caucasian race."}, {"letter": "C", "text": "Number of prior vaginal delivereries."}, {"letter": "D", "text": "Caffeine intake."}, {"letter": "E", "text": "Large birth weight."}], "answer": "D", "rationale": ". Caffeine intake.\nCampbell Review\nrationale:\nD. Caffeine intake. Caffeine consumption has been associated with urinary urgency, but most studies have not necessarily noted an association with urinary incontinence. All other factors mentioned have been associated with a form of UI.\nCampbell Big Book\nrationale: (Campbell Big Book printed pp. 2221-2224)\nThe Big Book risk-factor section links age, race, parity/vaginal childbirth, and large birth weight with UI risk. In contrast, the diet section describes caffeine, especially coffee, as linked mainly to OAB/urgency-type LUTS, with no consistent link to SUI. Therefore caffeine is the LUTS-associated factor that is not consistently tied to urinary incontinence itself in this question.\nCampbell Big Book screenshot(s):\nPrinted p. 2224: Risk-factor key points: caffeine is linked to OAB/storage symptoms, with no clear association with SUI.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q4_image_0004.png"]}, {"id": "CH115_Q5", "number": "5", "stem": "Later in life, when compared with a woman who had her first child at the age of 36, a woman delivering her first child at 23 years of age would be:", "choices": [{"letter": "A", "text": "more likely to experience SUI."}, {"letter": "B", "text": "equally likely to experience SUI."}, {"letter": "C", "text": "more likely to experience UUI."}, {"letter": "D", "text": "equally likely to experience UUI."}, {"letter": "E", "text": "less likely to experience MUI."}], "answer": "A", "rationale": ". more likely to experience SUI.\nCampbell Review\nrationale:\nA. More likely to experience SUI. Younger age at time of first pregnancy has been associated with a greater likelihood of developing SUI later in life.\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2222)\nThe Big Book notes that parity is most strongly associated with SUI and that UI risk appears accentuated by timing of the first birth. Women having their first child closer to age 20 appear to be at greatest risk in most studies. A first delivery at 23 therefore confers higher later SUI risk than first delivery at 36.\nCampbell Big Book screenshot(s):\nPrinted p. 2222: Parity section: first birth closer to age 20 is associated with greatest later UI risk; association strongest for SUI.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q5_image_0005.png"]}, {"id": "CH115_Q6", "number": "6", "stem": "The symptom most closely associated with the presence of advanced pelvic organ prolapse is the sensation of:", "choices": [{"letter": "A", "text": "pelvic pressure."}, {"letter": "B", "text": "pelvic pain."}, {"letter": "C", "text": "constipation."}, {"letter": "D", "text": "voiding difficulty."}, {"letter": "E", "text": "vaginal bulge."}], "answer": "E", "rationale": ". vaginal bulge.\nCampbell Review\nrationale:\nE. Vaginal bulge. Although all of the symptoms described can be associated with POP, only the specific complaint of a vaginal bulge has been consistently demonstrated to be associated with the presence of POP. All others can be associated with other conditions distinct from the presence of POP. For example, pelvic pressure can be related to pelvic floor dysfunction or a variety of other conditions, and pelvic pain can be associated with various forms of pelvic pathology including adnexal pathology.\nCampbell Big Book\nrationale: (Campbell Big Book printed pp. 2225-2227)\nThe Big Book emphasizes that a vaginal bulge that can be seen or felt is the most specific symptom of POP. It further states that the symptom with the strongest correlation with POP beyond the hymen is seeing or feeling a vaginal bulge, while pressure, pain, constipation, and voiding symptoms correlate poorly or have many alternate causes.\nCampbell Big Book screenshot(s):\nPrinted p. 2225: Symptoms of POP: a vaginal bulge that can be seen or felt is the most specific symptom; other symptoms correlate poorly.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q6_image_0006.png"]}, {"id": "CH115_Q7", "number": "7", "stem": "Which of the following Pelvic Organ Prolapse Quantification System (POP-Q) scores is implausible?", "choices": [{"letter": "A", "text": "Aa of -2"}, {"letter": "B", "text": "Ap of +4"}, {"letter": "C", "text": "Ba of +5"}, {"letter": "D", "text": "Bp of 0"}, {"letter": "E", "text": "C of -8"}], "answer": "B", "rationale": ". Ap of +4.\nCampbell Review\nrationale:\nB. Ap of + 4. POP-Q points are measured by their distance from the hymenal ring (in centimeters). By definition, Aa and Ap are the points 3 cm from the hymen on the anterior and posterior vaginal walls, respectively. It would be impossible for this point to be greater than 3 cm proximal (or distal) to the hymen. In advanced prolapse, this point could be up to 3 cm distal to the hymen. C point represents the distance from the hymen to the cervix or vaginal cuff (post hysterectomy). Ba and Bp point represent the leading edge of the most advanced aspect of the prolapse on the anterior and posterior vaginal walls, respectively. As such, they can be well beyond + 3 in advanced prolapse.\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2226)\nThe Big Book describes Aa and Ap as fixed points located 3 cm proximal to the hymenal ring on the anterior and posterior vaginal walls. Their possible range is therefore -3 to +3. Ap +4 is outside the anatomic range. By contrast, Ba and Bp represent the most distal points of anterior or posterior wall prolapse and can extend beyond +3 in advanced prolapse; C can vary according to cervix or cuff position.\nCampbell Big Book screenshot(s):\nPrinted p. 2226: POP-Q reference points: Aa/Ap are fixed 3 cm proximal to the hymen and range only from -3 to +3.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q7_image_0007.png"]}, {"id": "CH115_Q8", "number": "8", "stem": "A woman with POP-Q scores of Aa -2, Ba 0, C -5, Ap +1, Bp +1 would be considered to have what stage prolapse?", "choices": [{"letter": "A", "text": "Stage 0"}, {"letter": "B", "text": "Stage 1"}, {"letter": "C", "text": "Stage 2"}, {"letter": "D", "text": "Stage 3"}, {"letter": "E", "text": "Stage 4"}], "answer": "C", "rationale": ". Stage 2.\nCampbell Review\nrationale:\nC. Stage 2. Staging in POP-Q is based on the leading edge of prolapse. This equates to the highest (positive) number associated with the points listed (Aa, Ba, Ap, Bp, C). The leading edge of the most advanced POP is greater than 1 cm proximal to the hymen in patients with stage 1 prolapse. Stage 2 patients will have their leading edge between 1 cm proximal to and distal to the hymen. Stage 3 indicates a leading edge greater than 1 cm beyond the hymen but not completely everted (stage 4).\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2226)\nThe Big Book states that POP-Q stage is assigned according to the most severe portion of prolapse on maximal strain. Stage 2 is when the most distal portion is between 1 cm above and 1 cm below the hymen (-1 to +1). Here the leading edge is +1 at Ap/Bp, so the prolapse is stage 2.\nCampbell Big Book screenshot(s):\nPrinted p. 2226: POP-Q staging: stage 2 is defined by the leading edge between -1 cm and +1 cm from the hymen.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q8_image_0008.png"]}, {"id": "CH115_Q9", "number": "9", "stem": "A patient with a POP-Q score of Aa -2, Ba -2, Ap +2, Bp +2, and C 0 should be counseled to undergo:", "choices": [{"letter": "A", "text": "anterior colporrhaphy."}, {"letter": "B", "text": "posterior colporrhaphy."}, {"letter": "C", "text": "anterior and posterior colporrhaphy."}, {"letter": "D", "text": "posterior colporrhaphy and sacrospinous fixation."}, {"letter": "E", "text": "sacrospinous fixation."}], "answer": "D", "rationale": ". posterior colporrhaphy and sacrospinous fixation.\nCampbell Review\nrationale:\nD. Posterior colporrhaphy and sacrospinous fixation. This patient has both posterior compartment prolapse (based on Ap and Bp points beyond the hymen) and apical prolapse (C point at the hymen) based on the POP-Q score. Therefore the patient should be counseled to have both posterior repair of some type (posterior colporrhaphy in this example) and apical repair (sacrospinous fixation in this example).\nCampbell Big Book\nrationale: (Campbell Big Book printed pp. 2226, 2236)\nAp and Bp describe posterior vaginal wall points, and positive values beyond the hymen identify posterior compartment prolapse. C represents the cervix or vaginal cuff; C at 0 means the apex is at the hymenal ring, consistent with apical descent. The Big Book also stresses that apical support must be identified because loss of level I/apical support is crucial in optimizing POP management. Therefore treatment should address both the posterior compartment and the apex.\nCampbell Big Book screenshot(s):\nPrinted p. 2226: POP-Q point definitions: Ap/Bp describe posterior wall prolapse; C represents cervix or cuff/apex.\nPrinted p. 2236: Pelvic support: identification of apical POP/loss of level I support is crucial in optimizing POP management.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q9_image_0009.png", "ch115_ui_pop_quiz_assets/rationale_images/Q9_image_0010.png"]}, {"id": "CH115_Q10", "number": "10", "stem": "During bladder contraction, which is most active?", "choices": [{"letter": "A", "text": "Pelvic nerve"}, {"letter": "B", "text": "Hypogastric nerve"}, {"letter": "C", "text": "Pudendal nerve"}, {"letter": "D", "text": "A-delta nerves"}, {"letter": "E", "text": "Onuf nucleus"}], "answer": "A", "rationale": ". Pelvic nerve.\nCampbell Review\nrationale:\nA. Pelvic nerve. During bladder contraction, parasympathetic transmission (via the pelvic nerve) is active and sympathetic transmission (via the hypogastric nerve) is suppressed. Pudendal innervation to the external sphincter is suppressed. Pudendal innervation is derived from Onuf nucleus in the sacral cord. A-delta nerves (afferent) are active during storage and are involved in the spinal reflex mechanism that promotes closure of the bladder neck.\nCampbell Big Book\nrationale: (Campbell Big Book printed p. 2231)\nThe Big Book explains that storage depends on suppression of parasympathetic pelvic-nerve transmission with active sympathetic hypogastric outflow and pudendal sphincter activity. Coordinated voiding reverses this pattern: parasympathetic-mediated bladder contraction occurs via the pelvic nerve, while outlet resistance is relaxed.\nCampbell Big Book screenshot(s):\nPrinted p. 2231: Neural control of the LUT: parasympathetic pelvic nerve mediates bladder contraction; sympathetic hypogastric and pudendal activity are storage/outlet mechanisms.\nCampbell Review Chapter Summary\n1. Pelvic organ prolapse may mask incontinence.\n2. The prevalence of urinary incontinence in women is between 25% and 40%. Ten percent of women experience weekly incontinence episodes. Fecal incontinence occurs in 17% of women with pelvic organ prolapse.\n3. The female bladder neck is weaker than the male bladder neck and is often incompetent.\n4. In women, the majority of the urethra should be considered an active area of sphincter control; however, in the female the most important portion of continence is the mid-urethra.\n5. A Valsalva leak point pressure of less than 60 cm H2O indicates but does not confirm intrinsic sphincter dysfunction.\n6. Twelve percent of men report terminal dribbling.\n7. Rates of overactive bladder increase with age.\n8. Oral estrogen treatment is associated with the development of incontinence. Topical estrogen therapy is not linked to stress incontinence.\n9. Intrinsic properties of the urethra mucosa and urethra wall are important in maintaining continence in women.\n10. The anterior vaginal wall provides posterior support of the urethra allowing for compression of the mid-urethra. The urethra is attached laterally to the arcus tendineus by the urethra pelvic ligaments.\n11. Urge UI and mixed UI appear to become more prevalent forms of UI with aging.\n12. Age is strongly correlated with the development of UI of all types. White women appear to be at greater risk for UI when compared with African American and Asian women in particular.\n13. POP-Q points are measured by their distance from the hymenal ring (in centimeters). By definition, Aa and Ap are the points 3 cm from the hymen on the anterior and posterior vaginal walls, respectively. Ba and Bp point represent the leading edge of the most advanced aspect of the prolapse on the anterior and posterior vaginal walls, respectively. Thus they can be well beyond + 3 in advanced prolapse. C point represents the distance from the hymen to the cervix or vaginal cuff (post hysterectomy).\n14. The leading edge of the most advanced POP is greater than 1 cm proximal to the hymen in patients with stage 1 prolapse. Stage 2 patients will have their leading edge between 1 cm proximal to and distal to the hymen. Stage 3 indicates a leading edge greater than 1 cm beyond the hymen but not completely everted.", "question_images": [], "rationale_images": ["ch115_ui_pop_quiz_assets/rationale_images/Q10_image_0011.png"]}];
+let answers = JSON.parse(localStorage.getItem("ch115_ui_pop_quiz_answers") || "{}");
+
+function esc(s) {
+  return String(s || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+function filtered() {
+  const s = document.getElementById("searchBox").value.toLowerCase().trim();
+  return QUESTIONS.filter(q => !s || [q.number,q.stem,q.rationale,...(q.choices||[]).map(c=>c.text)].join(" ").toLowerCase().includes(s));
+}
+
+function imgGrid(imgs) {
+  if (!imgs || !imgs.length) return "";
+  return `<div class="img-grid">${imgs.map(src=>`<div class="img-wrap"><a href="${src}" target="_blank"><img src="${src}"></a></div>`).join("")}</div>`;
+}
+
+function refImgs(q) {
+  if (!q.rationale_images || !q.rationale_images.length) return "";
+  return `<div class="ref-panel"><div class="ref-title">Campbell Big Book Screenshot(s) Inside Rationale</div>${imgGrid(q.rationale_images)}</div>`;
+}
+
+function render() {
+  const qs = filtered();
+  const exam = document.getElementById("exam");
+  exam.innerHTML = "";
+
+  qs.forEach((q, idx) => {
+    let choices = "";
+    if (q.choices && q.choices.length) {
+      choices = q.choices.map(c => {
+        let cls = "choice";
+        if (answers[q.id]) {
+          if (c.letter === q.answer) cls += " correct";
+          else if (answers[q.id] === c.letter) cls += " wrong";
+        }
+        return `<label class="${cls}"><input type="radio" name="${q.id}" value="${c.letter}" ${answers[q.id]===c.letter?"checked":""} onchange="selectAns('${q.id}','${c.letter}')"> <b>${c.letter}.</b> ${esc(c.text)}</label>`;
+      }).join("");
+    } else {
+      choices = `<div class="choice"><b>Choices not parsed cleanly.</b> Review rationale.</div>`;
+    }
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card_" + q.id;
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="meta">${idx+1}. Question ${esc(q.number)}
+          <span class="badge">${q.question_images.length} question image(s)</span>
+          <span class="badge">${q.rationale_images.length} reference screenshot(s)</span>
+        </div>
+        <div>${esc(q.id)}</div>
+      </div>
+      <div class="card-body">
+        <div class="stem">${esc(q.stem)}</div>
+        ${imgGrid(q.question_images)}
+        ${choices}
+        <div class="answer-box" style="display:${answers[q.id] ? "block" : "none"}"><b>Correct answer:</b> ${esc(q.answer || "Not detected")}</div>
+        <button onclick="toggleRat('${q.id}')">Show / Hide rationale</button>
+        <div class="rationale" id="rat_${q.id}">
+          <div class="rat-section"><b>Rationale:</b>\n\n${esc(q.rationale || "No rationale extracted.")}</div>
+          ${refImgs(q)}
+        </div>
+      </div>`;
+    exam.appendChild(card);
+  });
+
+  const answered = qs.filter(q => answers[q.id]).length;
+  const correct = qs.filter(q => q.answer && answers[q.id] === q.answer).length;
+  document.getElementById("stats").textContent = `Visible: ${qs.length} / ${QUESTIONS.length} | Answered: ${answered} | Correct: ${correct} | Score: ${answered ? Math.round(correct/answered*100) : 0}%`;
+}
+
+function selectAns(id, letter) {
+  answers[id] = letter;
+  localStorage.setItem("ch115_ui_pop_quiz_answers", JSON.stringify(answers));
+  render();
+  const r = document.getElementById("rat_" + id);
+  if (r) r.style.display = "block";
+}
+
+function toggleRat(id) {
+  const r = document.getElementById("rat_" + id);
+  r.style.display = r.style.display === "block" ? "none" : "block";
+}
+
+function showAll() { document.querySelectorAll(".rationale").forEach(e => e.style.display = "block"); }
+function hideAll() { document.querySelectorAll(".rationale").forEach(e => e.style.display = "none"); }
+function resetQuiz() {
+  if (!confirm("Reset all answers?")) return;
+  answers = {};
+  localStorage.removeItem("ch115_ui_pop_quiz_answers");
+  render();
+}
+function nextUnanswered() {
+  const next = filtered().find(q => !answers[q.id]);
+  if (next) document.getElementById("card_" + next.id).scrollIntoView({behavior:"smooth", block:"start"});
+  else alert("All visible questions answered.");
+}
+render();
+</script>
+</body>
+</html>
